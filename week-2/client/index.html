@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Courses Client</title>
+  <style>
+    body{font-family: Arial, Helvetica, sans-serif; max-width:900px;margin:20px}
+    label{display:block;margin:8px 0}
+    input{padding:6px}
+    button{margin-left:6px}
+    li{margin:6px 0}
+  </style>
+</head>
+<body>
+  <h1>Cursos</h1>
+
+  <section>
+    <h2>Crear curso</h2>
+    <form id="createForm">
+      <label>Nombre: <input id="name" required /></label>
+      <label>Creditos: <input id="credits" type="number" required /></label>
+      <button type="submit">Crear</button>
+    </form>
+    <div id="createResult" aria-live="polite"></div>
+  </section>
+
+  <hr />
+
+  <section>
+    <h2>Todos los cursos</h2>
+    <button id="refresh">Actualizar lista</button>
+    <ul id="courses"></ul>
+  </section>
+
+  <script>
+    const api = 'http://localhost:3001/course';
+
+    document.getElementById('createForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const credits = Number(document.getElementById('credits').value);
+      try{
+        const res = await fetch(api, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({name, credits})
+        });
+        const data = await res.json();
+        if(res.ok){
+          document.getElementById('createResult').textContent = 'Creado: ' + (data._id || JSON.stringify(data));
+          document.getElementById('createForm').reset();
+          loadCourses();
+        } else {
+          document.getElementById('createResult').textContent = 'Error: ' + (data.message || JSON.stringify(data));
+        }
+      } catch(err){
+        document.getElementById('createResult').textContent = 'Error de red';
+      }
+    });
+
+    async function loadCourses(){
+      try{
+        const res = await fetch(api);
+        const data = await res.json();
+        const ul = document.getElementById('courses');
+        ul.innerHTML = '';
+        if(Array.isArray(data)){
+          data.forEach(c => {
+            const li = document.createElement('li');
+            li.textContent = `${c.name} (${c.credits} creditos)`;
+
+            const edit = document.createElement('button');
+            edit.textContent = 'Editar';
+            edit.onclick = async () => {
+              const newName = prompt('Name', c.name);
+              if(newName == null) return;
+              const newCredits = prompt('Credits', c.credits);
+              if(newCredits == null) return;
+              const r = await fetch(api + '?id=' + c._id, {
+                method: 'PUT',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({name: newName, credits: Number(newCredits)})
+              });
+              if(r.ok) loadCourses(); else { const e = await r.json(); alert('Update failed: ' + (e.message||JSON.stringify(e))); }
+            };
+
+            const del = document.createElement('button');
+            del.textContent = 'Eliminar';
+            del.onclick = async () => {
+              if(!confirm('Eliminar este curso?')) return;
+              const r = await fetch(api + '?id=' + c._id, { method: 'DELETE' });
+              if(r.status === 204) loadCourses(); else { const e = await r.json(); alert('Delete failed: ' + (e.message||JSON.stringify(e))); }
+            };
+
+            li.appendChild(document.createTextNode(' '));
+            li.appendChild(edit);
+            li.appendChild(document.createTextNode(' '));
+            li.appendChild(del);
+            ul.appendChild(li);
+          });
+        } else {
+          ul.innerHTML = '<li>No cursos</li>';
+        }
+      } catch(err){
+        document.getElementById('courses').innerHTML = '<li>No se pueden cargar los cursos</li>';
+      }
+    }
+
+    document.getElementById('refresh').addEventListener('click', loadCourses);
+    loadCourses();
+  </script>
+</body>
+</html>
