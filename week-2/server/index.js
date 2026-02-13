@@ -36,7 +36,7 @@ app.post('/course', async (req, res) => {
 
     try {
         const courseCreated = await course.save();
-        //add header location to the response
+        
         res.header('Location', `/course?id=${courseCreated._id}`);
         res.status(201).json(courseCreated)
     }
@@ -47,7 +47,7 @@ app.post('/course', async (req, res) => {
 
 app.get('/course', async (req, res) => {
     try{
-        //if id is passed as query param, return single course else return all courses
+        
         if(!req.query.id){
             const data = await Course.find();
             return res.status(200).json(data)
