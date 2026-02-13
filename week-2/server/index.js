@@ -61,7 +61,7 @@ app.get('/course', async (req, res) => {
 })
 
 
-// update a course by id passed as query param ?id=...
+// actualizar un curso por id pasado como query param ?id=
 app.put('/course', async (req, res) => {
     try {
         const id = req.query.id;
@@ -80,7 +80,7 @@ app.put('/course', async (req, res) => {
     }
 });
 
-// delete a course by id passed as query param ?id=...
+// eliminar un curso por id pasado como query param ?id=
 app.delete('/course', async (req, res) => {
     try {
         const id = req.query.id;
@@ -88,7 +88,7 @@ app.delete('/course', async (req, res) => {
 
         const deleted = await Course.findByIdAndDelete(id);
         if(!deleted) return res.status(404).json({message: 'Course not found'});
-        // no content
+        // no tiene 
         res.status(204).send();
     }
     catch (error) {
@@ -97,5 +97,5 @@ app.delete('/course', async (req, res) => {
 });
 
 
-//start the app
+//iniciar la app
 app.listen(3001, () => console.log(`UTN API service listening on port 3001!`))
