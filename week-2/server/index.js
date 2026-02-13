@@ -72,7 +72,7 @@ app.put('/course', async (req, res) => {
             credits: req.body.credits
         }, { new: true, runValidators: true });
 
-        if(!updated) return res.status(404).json({message: 'Course not found'});
+        if(!updated) return res.status(404);
         res.status(200).json(updated);
     }
     catch (error) {
@@ -87,7 +87,7 @@ app.delete('/course', async (req, res) => {
         if(!id) return res.status(400).json({message: 'id query param required'});
 
         const deleted = await Course.findByIdAndDelete(id);
-        if(!deleted) return res.status(404).json({message: 'Course not found'});
+        if(!deleted) return res.status(404);
         // no tiene 
         res.status(204).send();
     }
