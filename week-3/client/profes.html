@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
+  <link rel="stylesheet" href="../css/styles.css">
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Courses Client</title>
   <style>
@@ -12,13 +13,25 @@
   </style>
 </head>
 <body>
-  <h1>Cursos</h1>
+    <!-- Menú -->
+    <nav>
+        <ul>
+            <li><a href="./index.html">Home</a></li>
+            <li><a href="./profes.html">Profes</a></li>
+            <li><a href="./credits.html">Créditos</a></li>
+        </ul>
+    </nav>
+
+  <h1>Profesores
+  </h1>
 
   <section>
-    <h2>Crear curso</h2>
+    <h2>Añadir profesor</h2>
     <form id="createForm">
       <label>Nombre: <input id="name" required /></label>
-      <label>Creditos: <input id="credits" type="number" required /></label>
+      <label>Apellido: <input id="lastname" required /></label>
+      <label> Cedula: <input id="id_c" type="number" required /></label>
+      <label> Edad: <input id="age" type="number" required /></label>
       <button type="submit">Crear</button>
     </form>
     <div id="createResult" aria-live="polite"></div>
