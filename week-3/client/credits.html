@@ -27,7 +27,12 @@
     <h2>Crear curso</h2>
     <form id="createForm">
       <label>Nombre: <input id="name" required /></label>
+      <label>Codigo: <input id="code" required /></label>
+      <label>Description: <input id="description" required /></label>
+      <label>ID Profesor: <select id="id_professor" required>
+      </select> </label>
       <label>Creditos: <input id="credits" type="number" required /></label>
+
       <button type="submit">Crear</button>
     </form>
     <div id="createResult" aria-live="polite"></div>
@@ -48,11 +53,15 @@
       e.preventDefault();
       const name = document.getElementById('name').value.trim();
       const credits = Number(document.getElementById('credits').value);
+      const code = document.getElementById('code').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const id_professor = Number(document.getElementById('id_professor').value);
+
       try{
         const res = await fetch(api, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({name, credits})
+          body: JSON.stringify({name, credits, code, description, id_professor})
         });
         const data = await res.json();
         if(res.ok){
@@ -76,7 +85,7 @@
         if(Array.isArray(data)){
           data.forEach(c => {
             const li = document.createElement('li');
-            li.textContent = `${c.name} (${c.credits} creditos)`;
+            li.textContent = `${c.name} (${c.credits} creditos - Profesor: ${c.id_professor})`;
 
             const edit = document.createElement('button');
             edit.textContent = 'Editar';
@@ -114,6 +123,28 @@
         document.getElementById('courses').innerHTML = '<li>No se pueden cargar los cursos</li>';
       }
     }
+
+    async function cargarProfesores() {
+      try {
+        const res = await fetch('http://localhost:3001/professor');
+        const data = await res.json();
+        const select = document.getElementById('id_professor');
+        //select.innerHTML = '<option value=""></option>';
+        if(Array.isArray(data)) {
+          data.forEach(p => {
+            const option = document.createElement('option');
+            option.value = p.id_c;
+            option.textContent = `${p.id_c} ${p.name}`;
+            select.appendChild(option);
+          });
+        }
+
+      } catch(err) {
+        console.error('Error cargando profesores:', err);
+      }
+    }
+
+    cargarProfesores();
 
     document.getElementById('refresh').addEventListener('click', loadCourses);
     loadCourses();
